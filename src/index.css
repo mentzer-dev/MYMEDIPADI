@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* Trustworthy Medical Palette: Clinical Blues & Mint Greens */
+  --color-med-teal-50: #f0fdfa;
+  --color-med-teal-100: #ccfbf1;
+  --color-med-teal-500: #14b8a6;
+  --color-med-teal-600: #0d9488;
+  --color-med-teal-700: #0f766e;
+  --color-med-teal-800: #115e59;
+  --color-med-teal-900: #134e4a;
+
+  --color-med-blue-50: #f0f9ff;
+  --color-med-blue-100: #e0f2fe;
+  --color-med-blue-500: #0ea5e9;
+  --color-med-blue-600: #0284c7;
+  --color-med-blue-700: #0369a1;
+  --color-med-blue-800: #075985;
+  --color-med-blue-900: #0c4a6e;
+
+  --color-med-mint-50: #ecfdf5;
+  --color-med-mint-100: #d1fae5;
+  --color-med-mint-500: #10b981;
+  --color-med-mint-600: #059669;
+  --color-med-mint-700: #047857;
+}
+
+/* Custom scrollbars for clean clinical tables and message streams */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+

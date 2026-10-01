@@ -1,0 +1,7 @@
+{
+  "name": "MyMediPadi - Healthcare Workflow & Appointment Optimization",
+  "description": "Healthtech workflow optimization platform designed to reduce patient wait times and streamline clinic appointments.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
