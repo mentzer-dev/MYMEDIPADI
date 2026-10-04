@@ -5,7 +5,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(() => {
   return {
-    base: '/MYMEDIPADI/', // <-- Add this line right here (matching your exact repo name case)
+    base: '//', 
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
