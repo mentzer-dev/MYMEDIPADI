@@ -23,16 +23,42 @@ interface BookingProps {
   onSuccess?: (createdAppointment: Appointment) => void;
 }
 
+const formatDateKey = (date: Date) => {
+  const zoned = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return zoned.toISOString().slice(0, 10);
+};
+
+const buildUpcomingDates = () => {
+  const today = new Date();
+
+  return Array.from({ length: 6 }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + index);
+
+    const label =
+      index === 0
+        ? 'Today (Walk-In Slots)'
+        : index === 1
+        ? 'Tomorrow'
+        : date.toLocaleDateString('en-US', { weekday: 'long' });
+
+    return {
+      label,
+      dateStr: formatDateKey(date),
+      dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
+    };
+  });
+};
+
 export const AppointmentBookingModal: React.FC<BookingProps> = ({ isOpen, onClose, onSuccess }) => {
   const { services, doctors, bookNewAppointment } = useClinic();
+  const upcomingDates = buildUpcomingDates();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [selectedDepartment, setSelectedDepartment] = useState<string>('All');
   const [selectedService, setSelectedService] = useState<ClinicService>(services[0]);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor>(doctors[0]);
-
-  // Default to tomorrow or today
-  const [selectedDate, setSelectedDate] = useState<string>('2026-10-02');
+  const [selectedDate, setSelectedDate] = useState<string>(upcomingDates[1]?.dateStr ?? formatDateKey(new Date()));
   const [selectedSlot, setSelectedSlot] = useState<string>('10:00 AM');
   const [reason, setReason] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -40,14 +66,12 @@ export const AppointmentBookingModal: React.FC<BookingProps> = ({ isOpen, onClos
 
   if (!isOpen) return null;
 
-  // Departments list extracted from services
   const departments = ['All', 'Outpatient Care', 'Specialty Care', 'Pediatrics', 'Dermatology', 'Diagnostics'];
 
   const filteredServices = selectedDepartment === 'All'
     ? services
     : services.filter(s => s.department.toLowerCase().includes(selectedDepartment.toLowerCase()));
 
-  // Available physicians filtered by department relevance
   const filteredDoctors = doctors.filter(d => {
     if (selectedService.department.includes('Pediatrics')) {
       return d.specialty.includes('Pediatrics');
@@ -55,18 +79,8 @@ export const AppointmentBookingModal: React.FC<BookingProps> = ({ isOpen, onClos
     if (selectedService.department.includes('Specialty Care') || selectedService.name.includes('Cardiology')) {
       return d.specialty.includes('Cardiovascular');
     }
-    return true; // Dr. Thorne and generalists available for all
+    return true;
   });
-
-  // Next 6 days options
-  const upcomingDates = [
-    { label: 'Today (Walk-In Slots)', dateStr: '2026-10-01', dayName: 'Thu' },
-    { label: 'Tomorrow', dateStr: '2026-10-02', dayName: 'Fri' },
-    { label: 'Saturday', dateStr: '2026-10-03', dayName: 'Sat' },
-    { label: 'Next Monday', dateStr: '2026-10-05', dayName: 'Mon' },
-    { label: 'Next Tuesday', dateStr: '2026-10-06', dayName: 'Tue' },
-    { label: 'Next Wednesday', dateStr: '2026-10-07', dayName: 'Wed' },
-  ];
 
   const morningSlots = [
     { time: '09:00 AM', traffic: 'Optimal Flow', waitEst: '5m wait' },
@@ -379,7 +393,6 @@ export const AppointmentBookingModal: React.FC<BookingProps> = ({ isOpen, onClos
             {/* Step 3: Date & Available Time Slot */}
             {step === 3 && (
               <div className="p-6 space-y-5 overflow-y-auto flex-1">
-                {/* Date Picker Buttons */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-xs font-bold text-slate-800">
@@ -511,7 +524,6 @@ export const AppointmentBookingModal: React.FC<BookingProps> = ({ isOpen, onClos
             {/* Step 4: Reason & Symptoms Review */}
             {step === 4 && (
               <form onSubmit={handleCompleteBooking} className="p-6 space-y-4 overflow-y-auto flex-1">
-                {/* Summary Card */}
                 <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-2">
                   <div className="flex justify-between">
                     <span className="text-slate-500">Service:</span>
@@ -531,7 +543,6 @@ export const AppointmentBookingModal: React.FC<BookingProps> = ({ isOpen, onClos
                   </div>
                 </div>
 
-                {/* Quick Presets */}
                 <div>
                   <label className="block text-xs font-bold text-slate-800 mb-1.5">
                     Quick Reason Presets:
