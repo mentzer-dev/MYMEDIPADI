@@ -156,12 +156,15 @@ export type AuditActionType =
   | 'TRIAGE_UPDATED'
   | 'WALK_IN_ENQUEUED';
 
+export type AuditActorType = 'patient' | 'doctor' | 'nurse' | 'system';
+
 export interface AuditLogEntry {
   id: string;
   timestamp: string;
   actorId: string;
   actorName: string;
   actorRole: string;
+  actorType: AuditActorType;
   actionType: AuditActionType;
   patientId: string;
   patientName: string;
@@ -171,4 +174,3 @@ export interface AuditLogEntry {
   workstation: string;
   verified: boolean;
 }
-
