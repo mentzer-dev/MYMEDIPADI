@@ -24,19 +24,38 @@ interface PatientDashboardProps {
   setActiveTab: (tab: string) => void;
 }
 
+const parseAppointmentDateTime = (appointment: Appointment): number => {
+  if (!appointment.date || !appointment.timeSlot) return Number.MAX_SAFE_INTEGER;
+
+  const [year, month, day] = appointment.date.split('-').map(Number);
+  const match = appointment.timeSlot.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+
+  if (!match) return Number.MAX_SAFE_INTEGER;
+
+  const [, hoursRaw, minutesRaw, meridiem] = match;
+  let hours = Number(hoursRaw);
+  const minutes = Number(minutesRaw);
+
+  if (meridiem.toUpperCase() === 'PM' && hours !== 12) hours += 12;
+  if (meridiem.toUpperCase() === 'AM' && hours === 12) hours = 0;
+
+  return new Date(year, (month || 1) - 1, day || 1, hours, minutes || 0, 0, 0).getTime();
+};
+
 export const PatientDashboard: React.FC<PatientDashboardProps> = ({ activeTab, setActiveTab }) => {
   const { patient, appointments, checkInForAppointment } = useClinic();
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [highlightedAptId, setHighlightedAptId] = useState<string | null>(null);
 
-  // Find next upcoming appointment for countdown timer
-  const upcomingApts = appointments.filter(
-    (a) =>
-      a.patientId === patient.id &&
-      (a.status === 'Upcoming' || a.status === 'In Queue' || a.status === 'In Consultation')
-  );
+  // Find the actual next future appointment for the patient and sort chronologically.
+  const upcomingApts = appointments
+    .filter(
+      (a) =>
+        a.patientId === patient.id &&
+        (a.status === 'Upcoming' || a.status === 'In Queue' || a.status === 'In Consultation')
+    )
+    .sort((a, b) => parseAppointmentDateTime(a) - parseAppointmentDateTime(b));
 
-  // The primary next appointment for the timer
   const nextAppointment = upcomingApts.length > 0 ? upcomingApts[0] : null;
 
   const handleBookingSuccess = (created: Appointment) => {
